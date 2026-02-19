@@ -11,47 +11,11 @@ USE PeruMacroEconometrics;
 GO
 
 
--- Create a data model table to unify the indicators
-    -- DIMS (Filters) 
-CREATE TABLE Dim_Calendario (
-    Fecha DATE PRIMARY KEY,
-    Anio INT,
-    Mes INT
-);
-
-CREATE TABLE Dim_Geografia (
-    ID_Region INT IDENTITY(1,1) PRIMARY KEY,
-    Nombre_Region VARCHAR(100) UNIQUE
-);
- 
-    -- FACTS 
-CREATE TABLE Fact_Macro_Mensual (
-    Fecha DATE,
-    Inflacion DECIMAL(10,4),
-    PBI DECIMAL(10,4),
-    Tasa_Referencia DECIMAL(10,4),
-    RIN DECIMAL(18,2),
-    Gasto_Gobierno DECIMAL(18,2),
-    CONSTRAINT FK_Macro_Calendario FOREIGN KEY (Fecha) REFERENCES Dim_Calendario(Fecha)
-);
-
-CREATE TABLE Fact_Social_Anual (
-    Anio INT,
-    ID_Region INT,
-    Tasa_Pobreza DECIMAL(10,4),
-    Gasto_Real DECIMAL(18,2),
-    Gasto_Nominal DECIMAL(18,2),
-    CONSTRAINT FK_Social_Geo FOREIGN KEY (ID_Region) REFERENCES Dim_Geografia(ID_Region)
-);
-
-CREATE TABLE Fact_Informalidad (
-    Anio INT,
-    ID_Region INT,
-    Tasa_Informalidad DECIMAL(10,4),
-    CONSTRAINT FK_Info_Geo FOREIGN KEY (ID_Region) REFERENCES Dim_Geografia(ID_Region)
-);
+ALTER AUTHORIZATION ON DATABASE::PeruMacroEconometrics TO sa;
 GO
 
+
+-- Importing data from CSV files into staging tables
 
 SELECT * FROM stg_BCRP_Inflacion
 EXEC sp_rename 'stg_BCRP_Inflacion.Periodo', 'Period', 'COLUMN';
@@ -96,4 +60,46 @@ EXEC sp_rename 'stg_INEI_GastoHogares_dptos.Gasto_Real_Mensual_PerCapita', 'Real
 EXEC sp_rename 'stg_INEI_GastoHogares_dptos.Gasto_Nominal_Mensual_PerCapita', 'Nominal_Household_Exp', 'COLUMN';
 
 
+-- Create TABLE for unified macroeconomic indicators
+	
+	-- Geography Dimension
+DROP TABLE IF EXISTS Dim_Department;
+CREATE TABLE Dim_Department (
+	DepartmentID INT IDENTITY (1,1) PRIMARY KEY,
+	Department_Name NVARCHAR(100) UNIQUE
+);
+
+	-- Time Dimension
+DROP TABLE IF EXISTS Dim_Calendar;
+CREATE TABLE Dim_Calendar (
+	Date_Key DATE PRIMARY KEY, 
+	Year_Num INT,
+	Month_Num INT,
+	Month_Name VARCHAR(20)
+);
+
+-- Monthly Macroeconomic Facts
+DROP TABLE IF EXISTS Fact_Macro_Indicators;
+CREATE TABLE Fact_Macro_Indicators (
+    Date_Key DATE,
+    Inflation_Rate DECIMAL(10,4),
+    GDP_Var_Rate DECIMAL(10,4),
+    Reference_Rate DECIMAL(10,4),
+    Net_Int_Reserves_MUSD DECIMAL(18,2),
+    Gov_Spending_MSoles DECIMAL(18,2),
+    CONSTRAINT FK_Macro_Calendar FOREIGN KEY (Date_Key) REFERENCES Dim_Calendar(Date_Key)
+);
+
+-- Annual Social & Regional Facts
+DROP TABLE IF EXISTS Fact_Regional_Development;
+CREATE TABLE Fact_Regional_Development (
+    Year_Num INT,
+    DepartmentID INT,
+    Poverty_Rate DECIMAL(10,4),
+    Informality_Rate DECIMAL(10,4),
+    Real_Household_Exp DECIMAL(18,2),
+    Nominal_Household_Exp DECIMAL(18,2),
+    CONSTRAINT FK_Regional_Dept FOREIGN KEY (DepartmentID) REFERENCES Dim_Department(DepartmentID)
+);
+GO
 
