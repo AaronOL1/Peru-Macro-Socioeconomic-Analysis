@@ -1,7 +1,9 @@
 /*
 PROJECT: Peru Macro-Econometrics Data Engine
 AUTHOR: Aaron Olmedo López
-DESCRIPTION: ETL process to clean and unify BCRP (Macro) and INEI (Social) indicators.
+DESCRIPTION: Creating the data architecture for the Peru Macro-Econometrics Data Engine, 
+including database creation, staging tables for raw data, and dimensional modeling for unified
+macroeconomic and regional development indicators.
 */
 
 CREATE DATABASE PeruMacroEconometrics;
@@ -66,8 +68,14 @@ EXEC sp_rename 'stg_INEI_GastoHogares_dptos.Gasto_Nominal_Mensual_PerCapita', 'N
 DROP TABLE IF EXISTS Dim_Department;
 CREATE TABLE Dim_Department (
 	DepartmentID INT IDENTITY (1,1) PRIMARY KEY,
-	Department_Name NVARCHAR(100) UNIQUE
+	Department_Name NVARCHAR(100) UNIQUE,
+    Location_Type VARCHAR(50)
 );
+
+SELECT COLUMN_NAME 
+FROM INFORMATION_SCHEMA.COLUMNS 
+WHERE TABLE_NAME = 'Dim_Department';
+
 
 	-- Time Dimension
 DROP TABLE IF EXISTS Dim_Calendar;
@@ -102,4 +110,3 @@ CREATE TABLE Fact_Regional_Development (
     CONSTRAINT FK_Regional_Dept FOREIGN KEY (DepartmentID) REFERENCES Dim_Department(DepartmentID)
 );
 GO
-
