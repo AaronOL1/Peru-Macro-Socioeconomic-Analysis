@@ -144,6 +144,8 @@ END;
 GO
 
 -- Insert data into Fact_Macro_Indicators
+DELETE FROM Fact_Macro_Indicators;
+
 INSERT INTO Fact_Macro_Indicators (Date_Key, Inflation_Rate, GDP_Var_Rate, Reference_Rate, Net_Int_Reserves_MUSD, Gov_Spending_MSoles)
 SELECT 
     CAST('20' + RIGHT(inf.Period, 2) + '-' + 
