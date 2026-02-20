@@ -110,3 +110,72 @@ CREATE TABLE Fact_Regional_Development (
     CONSTRAINT FK_Regional_Dept FOREIGN KEY (DepartmentID) REFERENCES Dim_Department(DepartmentID)
 );
 GO
+
+
+-- **Insert data into TABLES**
+
+USE PeruMacroEconometrics
+GO
+
+-- Insert data into Dim_Department 
+INSERT INTO Dim_Department (Department_Name, Location_Type)
+SELECT DISTINCT Department, 'Department'
+FROM stg_INEI_Pobreza_dptos
+WHERE Department NOT IN ('Nacional', 'Urbano', 'Rural', 'Urbana') 
+  AND Department IS NOT NULL;
+
+INSERT INTO Dim_Department (Department_Name, Location_Type)
+VALUES 
+('Nacional', 'National'),
+('Urbana', 'Area'),
+('Rural', 'Area');
+GO
+
+
+-- Insert data into Dim_Calendar 
+DECLARE @StartDate DATE = '2000-01-01';
+DECLARE @EndDate DATE = '2026-12-31';
+WHILE @StartDate <= @EndDate
+BEGIN
+    INSERT INTO Dim_Calendar (Date_Key, Year_Num, Month_Num, Month_Name)
+    SELECT @StartDate, YEAR(@StartDate), MONTH(@StartDate), DATENAME(MONTH, @StartDate);
+    SET @StartDate = DATEADD(MONTH, 1, @StartDate);
+END;
+GO
+
+-- Insert data into Fact_Macro_Indicators
+INSERT INTO Fact_Macro_Indicators (Date_Key, Inflation_Rate, GDP_Var_Rate, Reference_Rate, Net_Int_Reserves_MUSD, Gov_Spending_MSoles)
+SELECT 
+    CAST('20' + RIGHT(inf.Period, 2) + '-' + 
+        CASE LEFT(inf.Period, 3)
+            WHEN 'Ene' THEN '01' WHEN 'Feb' THEN '02' WHEN 'Mar' THEN '03'
+            WHEN 'Abr' THEN '04' WHEN 'May' THEN '05' WHEN 'Jun' THEN '06'
+            WHEN 'Jul' THEN '07' WHEN 'Ago' THEN '08' WHEN 'Sep' THEN '09'
+            WHEN 'Oct' THEN '10' WHEN 'Nov' THEN '11' WHEN 'Dic' THEN '12'
+        END + '-01' AS DATE) as Date_Key,
+    TRY_CAST(inf.Inflation_Rate AS DECIMAL(10,4)),
+    TRY_CAST(pbi.GDP_Var_Rate AS DECIMAL(10,4)),
+    TRY_CAST(tr.Reference_Rate AS DECIMAL(10,4)),
+    TRY_CAST(rin.Net_Int_Reserves_MUSD AS DECIMAL(18,2)),
+    TRY_CAST(gs.Gov_Spending_MSoles AS DECIMAL(18,2))
+FROM stg_BCRP_Inflacion inf
+LEFT JOIN stg_BCRP_PBI pbi ON inf.Period = pbi.Period
+LEFT JOIN stg_BCRP_Tasa_Referencia tr ON inf.Period = tr.Period
+LEFT JOIN stg_BCRP_RIN rin ON inf.Period = rin.Period
+LEFT JOIN stg_BCRP_GastoNoFinanciero gs ON inf.Period = gs.Period;
+GO
+
+-- Insert data into Fact_Regional_Development
+INSERT INTO Fact_Regional_Development (Year_Num, DepartmentID, Poverty_Rate, Informality_Rate, Real_Household_Exp, Nominal_Household_Exp)
+SELECT 
+    CAST(pob.Period AS INT), 
+    d.DepartmentID,
+    TRY_CAST(pob.Poverty_Rate AS DECIMAL(10,4)),
+    TRY_CAST(inf.Informality_Rate AS DECIMAL(10,4)),
+    TRY_CAST(gas.Real_Household_Exp AS DECIMAL(18,2)),
+    TRY_CAST(gas.Nominal_Household_Exp AS DECIMAL(18,2))
+FROM stg_INEI_Pobreza_dptos pob
+JOIN Dim_Department d ON pob.Department = d.Department_Name
+LEFT JOIN stg_INEI_Map_Informalidad_dptos inf ON pob.Department = inf.Department AND pob.Period = inf.Period
+LEFT JOIN stg_INEI_GastoHogares_dptos gas ON pob.Department = gas.Department AND pob.Period = gas.Period;
+GO
