@@ -6,7 +6,7 @@ Peru presents a critical economic contradiction in the post-pandemic era. While 
 
 **The Reality:**
 * **Macro Stability:** High resilience to external shocks.
-* **Social Stagnation:** Monetary poverty remains stagnant at ~28.5%, and labor informality exceeds 70%.
+* **Social Stagnation:** Monetary poverty remains stagnant at ~28.5%, and labor informality exceeds .
 
 This project is not just a data analysis portfolio; it is the computational validation of a **Comprehensive Public Policy Proposal** designed to reactivate potential growth and close the structural disconnect between the BCRP's success and the reality of Peruvian households.
 
