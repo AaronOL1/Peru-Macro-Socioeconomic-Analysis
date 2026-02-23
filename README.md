@@ -13,7 +13,7 @@ This project is not just a data analysis portfolio; it is the computational vali
 ---
 
 ## 🏛️ Research & Economic Hypothesis
-Based on the **IS-LM-MC theoretical model** (Mundell-Fleming for small open economies) and the "Propuesta Integral de Política Públicas 2026" paper included in this repository.
+The analytical framework is anchored in the **IS-LM-MC theoretical model** (Mundell-Fleming for small open economies) and detailed in the working paper *"Propuesta Integral de Política Públicas 2026"* included in this repository.
 
 ### The Core Problem
 The "Inertial Growth Model" that sustained Peru for decades has been exhausted. Fiscal discipline alone is insufficient to protect vulnerable populations or close productivity gaps in the Andean and Jungle regions.
@@ -43,6 +43,25 @@ Using Python (Pandas/Seaborn) to calculate the Pearson Correlation Matrix on his
 
 ---
 
+## 📈 Interactive Dashboard: Visualizing the Solution
+The culmination of this project is an interactive Power BI dashboard that diagnoses the structural failure and projects the optimized policy outcome. 
+
+### Figure 1: The Macro-Social Paradox (2015-2026)
+*Despite nominal stability (controlled inflation and international reserves), poverty rates remain stagnant, revealing the exhaustion of the inertial growth model.*
+![The Macro-Social Paradox](assets/capture1.png)
+
+### Figure 2: The Structural Trap
+*Correlation analysis (2023) confirms that regional labor informality (>70%) is the primary bottleneck for poverty reduction, trapping vulnerable populations.*
+![The Structural Trap](assets/capture2.png)
+
+### Figure 3: Policy Proposal & Multiplier Effect
+*Projected GDP optimization through coordinated fiscal and monetary interventions. The dashboard models a Keynesian Multiplier effect to simulate economic recovery.*
+![Policy Proposal](assets/capture3.png)
+
+> 💡 **Explore the Dashboard:** Since GitHub does not support native Power BI interactives, you can view the static presentation in the `dashboard/Peru_Macroeconomic_Policy_Dashboard.pdf` file, or download the `.pbix` file to interact with the full data model locally.
+
+---
+
 ## 🛠️ Technical Implementation
 This repository translates economic theory into a functional Data Engineering and Analytics architecture.
 
@@ -55,8 +74,9 @@ This repository translates economic theory into a functional Data Engineering an
 * **Connection:** Established direct `pyodbc` pipelines between SQL Server and Python.
 * **Analysis:** Performed correlation analysis and statistical validation of the macroeconomic variables to test the research hypothesis.
 
-### **3. Business Intelligence (Power BI) - *In Progress***
-* Developing a **Geospatial Heatmap** to visualize the "Territorial Inequality," demonstrating how macroeconomic growth is concentrated in the coast while informality is absorbed by the Sierra and Selva regions.
+### **3. Business Intelligence (Power BI)**
+* **Geospatial & Trend Analysis:** Mapped the "Territorial Inequality," demonstrating how macroeconomic growth is concentrated in the coast while informality is absorbed by the Sierra and Selva regions.
+* **Advanced DAX:** Built custom projection tables and measures to mathematically visualize the $k=1.6$ multiplier effect via dynamic Waterfall charting.
 
 ---
 
