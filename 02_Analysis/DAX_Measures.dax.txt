@@ -1,0 +1,24 @@
+// ==========================================
+// DAX MEASURES - PERU MACROECONOMIC DASHBOARD
+// ==========================================
+
+// 1. Dynamic Table for Policy Projection (Keynesian Multiplier)
+// This table builds the scenarios for the 2026 Waterfall Chart based on the research paper.
+Policy_Projection = 
+DATATABLE (
+    "Policy_Step", STRING,
+    "Impact_GDP", DOUBLE,
+    "Order", INTEGER,
+    {
+        {"1. Base Inertial Growth", 2.50, 1},
+        {"2. Fiscal: Infrastructure (MEF)", 0.48, 2},
+        {"3. Monetary: Rate Cut (BCRP)", 0.16, 3}
+    }
+)
+
+// 2. Base Measures (Ensuring percentages are averaged, not summed)
+// Calculates the average poverty rate across regions.
+Avg_Poverty_Rate = AVERAGE(Fact_Regional_Development[Poverty_Rate])
+
+// Calculates the average labor informality rate across regions.
+Avg_Informality_Rate = AVERAGE(Fact_Regional_Development[Informality_Rate])
